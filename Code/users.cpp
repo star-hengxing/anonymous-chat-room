@@ -2,9 +2,8 @@
 #include <ctime>
 #include<string>
 #include"users.h"
-#include"server.h"
 
-using namespace std;
+#pragma warning(disable:4996)
 
 char *User::show_speak_time_and_id()
 {
@@ -22,7 +21,6 @@ char *User::show_speak_time_and_id()
 
 User::User()
 {
-    user_online=1;//创建对象证明用户上线
     srand(time(NULL));
-    id = rand() % 10000;//0-9999
+    id = rand() % 100000;//0-99999
 }

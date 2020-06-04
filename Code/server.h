@@ -7,7 +7,7 @@
 
 #define MAX_SIZE 100
 #define MAX_ONLINE 4    
-const char ROOT[]="!star";  //获得权限指令
+const char ROOT[] = "!star";  //权限指令
 
 class chat_server
 {
@@ -25,10 +25,11 @@ public:
     chat_server();
     ~chat_server();
     void wait_for_client_connect();
-    void create_client_thread(SOCKET client);
-    void send_server_information(SOCKET root);
-    bool send_message_to_other_user(SOCKET speak_client, char* buffer);
-    void administrator(SOCKET root);
+    void create_client_thread(const SOCKET& client);
+    void send_server_information(const SOCKET& root);
+    bool send_message_to_other_user(const SOCKET& speak_client, char* buffer);
+    void administrator(const SOCKET& root);
+    void CheckError(bool bool_execute, const char* ErrorMessage);
 };
 
 #endif

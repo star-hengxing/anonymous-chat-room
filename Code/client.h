@@ -3,7 +3,6 @@
 
 #include<winsock2.h>
 #pragma comment(lib,"ws2_32.lib")
-#pragma warning(disable:4996)
 
 #define MAX_BUFFER 100
 
@@ -20,6 +19,7 @@ public:
     ~Client();
     void send_message_to_server();
     void from_server_recv_message();
+    void CheckError(bool bool_execute,const char *ErrorMessage);
 };
 
 #endif
