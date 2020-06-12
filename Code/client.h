@@ -5,6 +5,7 @@
 #pragma comment(lib,"ws2_32.lib")
 
 #define MAX_BUFFER 100
+#define MAX_RECONNECT_COUNT 5
 
 class Client
 {
@@ -20,6 +21,7 @@ public:
     void send_message_to_server();
     void from_server_recv_message();
     void CheckError(bool bool_execute,const char *ErrorMessage);
+    void input_limit(char input[]);
 };
 
 #endif

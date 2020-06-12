@@ -1,6 +1,7 @@
 #include<iostream>
 #include<cstring>
 #include<thread>
+#include<conio.h>
 #include"client.h"
 #include"users.h"
 
@@ -18,7 +19,9 @@ void Client::CheckError(bool bool_execute, const char* ErrorMessage)
 //初始化
 Client::Client()
 {
-    server_port = 2712;//端口可以任由系统分配
+    //客户端端口可以任由操作系统分配
+    //服务器端口必须相同
+    server_port = 2712;
     strcpy(server_ip, "127.0.0.1");
     int error = WSAStartup(MAKEWORD(2, 2), &_wsadata);
     CheckError(error != 0, "初始化套接字库失败");
@@ -28,13 +31,13 @@ Client::Client()
     server_addr.sin_addr.S_un.S_addr = inet_addr(server_ip);
     server_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     CheckError(server_socket == INVALID_SOCKET, "启用套接字失败");
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < MAX_RECONNECT_COUNT; i++)
     {
         if (connect(server_socket, (sockaddr*)&server_addr, sizeof(server_addr)) == SOCKET_ERROR)
         {
             std::cout << "服务器连接失败，正在重新连接" << std::endl;
             std::cout << WSAGetLastError() << std::endl;
-            if (i == 9)
+            if (i == MAX_RECONNECT_COUNT-1)
             {
                 std::cout << "服务器多次连接失败，程序自动关闭" << std::endl;
                 exit(-1);
@@ -53,7 +56,7 @@ Client::Client()
             break;
         }
     }
-    std::cout << "输入!quit退出聊天室" << std::endl;
+    std::cout << "输入!quit退出匿名聊天室" << std::endl;
 }
 
 //清理环境
@@ -76,17 +79,12 @@ void Client::send_message_to_server()
     //recv_server_thread.detach();
     while (1)
     {
-        std::cin.getline(send_buffer, MAX_BUFFER);
+        input_limit(send_buffer);
         if (strncmp(send_buffer, "!quit", 6) == 0)
         {
             send(server_socket, "!quit", 6, 0);
             recv_server_thread.join();
             break;
-        }
-        else if (strlen(send_buffer) > MAX_BUFFER)
-        {
-            std::cout << "输入字符超过最大限度！" << std::endl;
-            continue;
         }
         send(server_socket, send_buffer, MAX_BUFFER, 0);
     }
@@ -116,4 +114,28 @@ void Client::from_server_recv_message()
             std::cout << recv_buffer << std::endl;
         }
     }
+}
+
+//限制输入大小
+void Client::input_limit(char input[])
+{
+	unsigned int record = 0;
+	unsigned char input_c;
+	while ((input_c = getch()) != '\r')
+	{
+		if (input_c != '\b' && record < MAX_BUFFER-2)//本来留一位空间给'\0'，但中文是占两位的，避免乱码和内存溢出
+		{
+			input[record] = input_c;
+			record++;
+			printf("%c", input_c);
+		}
+		else if (input_c == '\b' && record!=0)
+		{
+            //这一个\b \b在csdn某个博客看到的用法，我至今还未理解原理
+			record--;
+			printf("\b \b");
+		}
+	}
+	printf("\n");
+	input[record] = '\0';
 }
