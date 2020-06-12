@@ -1,5 +1,8 @@
 # 介绍
 anonymous chat room
+
+本质上是一个轻量级别的TCP聊天室
+
 **匿名聊天室**
 
 有client可以在此聊天室畅聊
